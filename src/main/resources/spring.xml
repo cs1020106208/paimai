@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:context="http://www.springframework.org/schema/context"
+		xmlns:aop="http://www.springframework.org/schema/aop"
+		xmlns:tx="http://www.springframework.org/schema/tx"
+		xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+			">
+			
+					<!-- 加载service包下的component相关的注解   让spring读取注解 -->
+<context:component-scan base-package="com.baizhi.service"></context:component-scan>
+
+			
+			
+			
+			<!-- 读区配置文件 -->
+	<context:property-placeholder location="classpath:druid.properties"/>
+
+		<!-- 创建数据库源对象 -->
+	<bean class="com.alibaba.druid.pool.DruidDataSource" id="dataSource">
+		<property name="driverClassName" value="${jdbc.driverClassName}"></property>
+		<property name="url" value="${jdbc.url}"></property>
+		<property name="username" value="${jdbc.username}"></property>
+		<property name="password" value="${jdbc.password}"></property>
+	</bean>
+	
+		<!--创建sqlsession工厂对象  -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+			<property name="dataSource" ref="dataSource"></property>
+	
+			<!--加载所有的mapper映射文件 返回的是数组类型  支持用通配符*  -->
+		<property name="mapperLocations">
+			<list>
+<!-- 			<value>classpath:com.baizhi.dao.*Mapper.xml</value>
+ -->
+ 				<value>classpath:Mapper/*Mapper.xml</value>
+ 			</list>
+		</property>
+		<!-->给entity包下的所有类起别名别名就是类名 ：com.baizhi.entity.User===User(别名) -->
+		<property name="typeAliasesPackage" value="com.baizhi.entity"> </property>
+	</bean>
+	
+	
+	<!-- 创建事务管理对象 -->
+<bean class="org.springframework.jdbc.datasource.DataSourceTransactionManager" id="dxManager">
+	<property name="dataSource" ref="dataSource"/>
+</bean>
+
+<!--事务增强处理 -->
+<tx:advice id="dxAdvice" transaction-manager="dxManager">
+	<!-- 配置事务规则，哪些方法，需要用什么样的事务s -->
+	<tx:attributes>
+		<tx:method name="select*" read-only="true"/>
+		<tx:method name="*"  propagation="REQUIRED"/>
+	</tx:attributes>
+</tx:advice>
+
+<!-- 增强处理 -->
+<aop:config>
+	<aop:pointcut expression="execution(* com.baizhi.service.*.*(..))" id="servicePointcut"/>
+	<aop:advisor advice-ref="dxAdvice" pointcut-ref="servicePointcut"/>
+</aop:config>
+
+	
+	
+		<!-- 创建dao接口对象 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.baizhi.dao"></property>
+	</bean>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+<!-- 	 创建用户业务
+	<bean class="com.baizhi.service.impl.UserServiceImpl" id="userService">
+		<property name="userDao" ref="userDao"></property>
+	</bean>
+	
+	创建用户action
+	<bean class="com.baizhi.action.UserAction" id="userAction" scope="prototype">
+		<property name="userService" ref="userService"></property>
+	</bean>
+	
+	
+	
+	创建商品业务
+	<bean class="com.baizhi.service.impl.AuctionServiceImpl" id="auctionService">
+		<property name="auctionDao" ref="auctionDao"></property>
+	</bean>
+	
+	创建商品action
+	<bean class="com.baizhi.action.AuctionAction" id="auctionAction" scope="prototype">
+		<property name="auctionService" ref="auctionService"></property>
+	</bean>
+	
+	
+	创建记录业务
+	<bean class="com.baizhi.service.impl.RecordServiceImpl" id="recordService">
+		<property name="recordDao" ref="recordDao"></property>
+	</bean>
+	
+	创建商品action
+	<bean class="com.baizhi.action.RecordAction" id="recordAction" scope="prototype">
+		<property name="auctionService" ref="auctionService"></property>
+		<property name="recordService" ref="recordService"></property>
+	</bean>
+	 -->
+	
+</beans>

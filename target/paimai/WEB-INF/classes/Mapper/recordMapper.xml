@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <!-- namespace等于全限定名 -->
+<mapper namespace="com.baizhi.dao.RecordDao">
+
+
+<!-- <resultMap type="com.baizhi.entity.Record" id="RecordMap">
+			<id column="id" property="id"/>
+			<result column="user_id" property="user_id"/>
+			<result column="auction_id" property="auction_id"/>
+			<result column="auction_time" property="auction_time"/>
+			<result column="auction_price" property="auction_price"/>
+
+	<association property="user" javaType="com.baizhi.entity.User">
+			<id column="user_id" property="user_id"/>
+			<result column="user_name" property="user_name"/>
+			<result column="user_password" property="user_password"/>
+			<result column="user_card_no" property="user_card_no"/>
+			<result column="user_tel" property="user_tel"/>
+			<result column="user_address" property="user_address"/>
+			<result column="user_post_number" property="user_post_number"/>
+			<result column="user_is_admin" property="user_is_admin"/>
+			<result column="user_question" property="user_question"/>
+			<result column="user_answer" property="user_answer"/>
+	
+	</association>
+
+
+</resultMap> -->
+
+
+
+<!-- 查询全部 -->
+<select id="selectAll" resultType="com.baizhi.entity.RecordDTO">
+<!-- select * from auction_record where auction_id=#{id} order by auction_price desc
+ -->
+<!--  select r.auction_time, r.auction_price,u.user_name
+from auction_record r left join auction_user u
+on r.user_id=u.user_id
+where auction_id=#{id}
+order by auction_price desc   -->
+
+
+	select ar.auction_time,ar.auction_price,u.user_name from(
+  select *
+	from auction  a left join auction_record r 
+	on a.auction_id=r.auction_id where a.auction_id=#{id})ar left join auction_user u
+  on ar.user_id=u.user_id
+  order by ar.auction_price desc
+
+</select>
+
+
+
+		<!-- 添加商品 -->
+		<insert id="insert">
+		insert into auction_record values(rec_seq.nextval,#{user_id},#{auction_id},sysdate,#{auction_price})
+		</insert>
+
+
+
+
+</mapper>
